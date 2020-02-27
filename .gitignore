@@ -1,0 +1,14 @@
+.pickle
+.env
+.lock
+
+Pipfile.lock
+
+bin/
+rows/
+.vscode/
+
+
+Flask/flask_session/*
+!Flask/flask_session/.keep
+
