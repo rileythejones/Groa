@@ -1,7 +1,8 @@
 import boto3
 import json 
 from datetime import datetime
-import random 
+import random
+import hashlib
 import pandas as pd 
 from recommender import Recommender
 from helpers import fill_id, df_to_id_list, prep_data
@@ -19,10 +20,10 @@ class PythonPredictor:
         # s3.download_file(config["bucket"], config["key"], "w2v_limitingfactor_v3.51.model")
 
         self.model = Recommender('models/w2v_limitingfactor_v3.51.model')
-#         self.model.connect_db()
+
         pass
 
-    def predict(self, payload=None): # recieves userid, outputs recommendation_id
+    def predict(self, payload): # recieves userid, outputs recommendation_id
         """Called once per request. Runs preprocessing of the request payload, inference, and postprocessing of the inference output. Required.
 
         Args:
@@ -31,22 +32,26 @@ class PythonPredictor:
         Returns:
             Prediction or a batch of predictions.
         """
+
         self.model.connect_db()
         user_id = payload
         
-        """ testing with local lettboxd data """
+        """ testing with local letterboxd data """
+        
 #         ratings = pd.read_csv('exported_data/imdb/riley_imdb_ratings.csv', engine='python')
 #         ratings = pd.read_csv('exported_data/letterboxd/riley/ratings.csv',  engine='python')
-#         ratings = pd.read_csv('exported_data/letterboxd/riley/ratings_triple.csv',  engine='python')
-#         ratings = pd.read_csv('exported_data/imdb/ratings.csv', engine='python')
-#         ratings = pd.read_csv('exported_data/letterboxd/cooper/ratings.csv')
-#         watched = pd.read_csv('exported_data/letterboxd/cooper/watched.csv')
-#         watchlist = pd.read_csv('exported_data/letterboxd/cooper/watchlist.csv')
         
+    
+        query = "SELECT EXISTS(SELECT 1 FROM user_letterboxd_ratings where user_id=%s);" 
+        self.model.cursor_dog.execute(query, (user_id,))
+        boolean = self.model.cursor_dog.fetchall()
         
-        
-#         id_book = pd.read_csv('exported_data/title_basics_small.csv')
-        
+        if boolean[0][0]==False: # True
+            self.model.cursor_dog.close()
+            self.model.connection.close()
+            return "user_id not found"
+    
+    
         self.model.cursor_dog.execute("SELECT date, name, year, letterboxd_uri, rating FROM user_letterboxd_ratings WHERE user_id=%s;", (user_id,))
         ratings_sql= self.model.cursor_dog.fetchall()
         ratings = pd.DataFrame(ratings_sql, columns = ['Date', 'Name', 'Year', 'Letterboxd URI', 'Rating'])
@@ -93,16 +98,20 @@ class PythonPredictor:
                 names_lists[names[x]].append(predictions[y][x])
                 
         results_dict = [dict(zip(names_lists,t)) for t in zip(*names_lists.values())]
-        json_data = json.dumps(results_dict)
+        recommendation_json = json.dumps(results_dict)
         
-
+        
         """ Commit to the database """
-        recommendation_id = 1234
+        
+        string_json = str(recommendation_json)
+        hash_object = hashlib.md5(string_json.encode('ascii'))
+        recommendation_id = hash_object.hexdigest()
+        
         query = "SELECT EXISTS(SELECT 1 FROM recommendations where recommendation_id=%s);" 
         self.model.cursor_dog.execute(query, (recommendation_id,))
         boolean = self.model.cursor_dog.fetchall()
-        recommendation_json = json_data
         date = datetime.now()
+        
         if boolean[0][0]: # True
             self.model.cursor_dog.close()
             self.model.connection.close()

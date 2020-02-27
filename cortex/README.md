@@ -1,3 +1,12 @@
+
+# live 
+- http://a089f8954598711eabfca0a99dfca0f4-233125349.us-east-1.elb.amazonaws.com/movie-recommender
+
+# test
+``` 
+curl -X POST -H "Content-Type: application/json" -d "1111" http://a089f8954598711eabfca0a99dfca0f4-233125349.us-east-1.elb.amazonaws.com/movie-recommender?debug=true
+```
+
 # Test Locally
 
 - On Windows replace *** with database password and run this in the terminal

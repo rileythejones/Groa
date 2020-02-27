@@ -20,11 +20,11 @@ class Recommender(object):
     def connect_db(self):
         """connect to database, create cursor."""
         connection = psycopg2.connect(
-            database  = os.getenv("DB_NAME"),
-            user      = os.getenv("DB_USER"),
-            password  = os.getenv("DB_PASSWORD"),
-            host      = os.getenv("DEV"),
-            port      = os.getenv("PORT")
+            database  = os.getenv('DB_NAME'),
+            user      = os.getenv('DB_USER'),
+            password  = os.getenv('DB_PASSWORD'),
+            host      = os.getenv('DB_DEV'),
+            port      = os.getenv('PORT')
         )
         # create cursor that is used throughout
         try:
