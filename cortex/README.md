@@ -1,3 +1,5 @@
+# The API takes in a user_id and returns a recommendation_id, the recommendation_json is commited to the recommendations table in the database. 
+
 
 # live 
 - http://ace1034515a4911ea8ecd028f1b5a1bc-1712147317.us-east-1.elb.amazonaws.com/movie-recommender
