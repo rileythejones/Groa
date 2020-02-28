@@ -1,10 +1,10 @@
 
 # live 
-- http://a089f8954598711eabfca0a99dfca0f4-233125349.us-east-1.elb.amazonaws.com/movie-recommender
+- http://ace1034515a4911ea8ecd028f1b5a1bc-1712147317.us-east-1.elb.amazonaws.com/movie-recommender
 
 # test
 ``` 
-curl -X POST -H "Content-Type: application/json" -d "1111" http://a089f8954598711eabfca0a99dfca0f4-233125349.us-east-1.elb.amazonaws.com/movie-recommender?debug=true
+curl -X POST -H "Content-Type: application/json" -d "1111" http://ace1034515a4911ea8ecd028f1b5a1bc-1712147317.us-east-1.elb.amazonaws.com/movie-recommender?debug=true
 ```
 
 # Test Locally
